@@ -14,10 +14,10 @@ func logRequest(next http.Handler) http.Handler {
 }
 
 func main() {
-	listen := flag.String("listen", ":8080", "listen address")
-	dir := flag.String("dir", ".", "directory to serve")
+	l := flag.String("l", ":8080", "listen address")
+	d := flag.String("d", ".", "directory to serve")
 	flag.Parse()
 
-	log.Printf("listening on %q...", *listen)
-	log.Fatalln(http.ListenAndServe(*listen, logRequest(http.FileServer(http.Dir(*dir)))))
+	log.Printf("listening on %q...", *l)
+	log.Fatal(http.ListenAndServe(*l, logRequest(http.FileServer(http.Dir(*d)))))
 }
