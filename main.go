@@ -8,16 +8,20 @@ import (
 
 func logRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s: %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.RequestURI)
+		log.Printf("%s %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.RequestURI)
 		next.ServeHTTP(w, r)
 	})
 }
 
 func main() {
-	l := flag.String("l", ":8080", "listen address")
-	d := flag.String("d", ".", "directory to serve")
+	var addr string
+	flag.StringVar(&addr, "a", ":8080", "address")
 	flag.Parse()
-
-	log.Printf("listening on %q...", *l)
-	log.Fatal(http.ListenAndServe(*l, logRequest(http.FileServer(http.Dir(*d)))))
+	dir := flag.Arg(0)
+	if dir == "" {
+		dir = "."
+	}
+	srv := http.FileServer(http.Dir(dir))
+	log.Printf("Serving %s on %s", dir, addr)
+	log.Fatal(http.ListenAndServe(addr, logRequest(srv)))
 }
